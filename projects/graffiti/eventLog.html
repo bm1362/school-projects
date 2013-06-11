@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Event Log</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+   <script type="text/javascript" src="js/jquery-1.7.1.js"></script>
+   <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+   <script type="text/javascript" src="js/json2.js"></script>
+   <script type="text/javascript" src="js/eventLog.js"></script>
+   <script src="http://www-cdn.justin.tv/javascripts/jtv_api.js"></script>
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.8.16.custom.css"/>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <div class="container-fluid">
+    <div class="title"><h2>Graffitti</h2></div>
+    <div class="sidebar" id="toolbar">
+      <div id="video-controls">
+        <input id="video-src-input" type="text" placeholder="dump iframe code here.."></input>
+        <button id="load-video" class="btn">Load</button>
+      </div>
+      <hr>
+      <div id="palette-box">
+        <div class="palette-choice red"></div>
+        <div class="palette-choice blue"></div>
+        <div class="palette-choice green"></div>
+        <div class="palette-choice white"></div>
+        <div class="palette-choice black"></div>
+        <div id="detailed-palette"></div>
+        <a id="toggle-detailed-palette">show more</a>
+      </div>
+
+      <div id="alpha-slider"></div>
+      <h7>SELECT A COLOR & ALPHA</h7>
+      <ul>
+         <li>Ctrl + Click - Fill</li>
+         <li>Alt + Click - Stroke</li>
+      </ul>
+      <hr>
+      <div id="style-box">
+        <div class="style-choice butt"></div>
+        <div class="style-choice round"></div>
+        <div class="style-choice square"></div>
+      </div>
+      <h7>SELECT A STYLE</h7>
+      <hr>
+      <div id="size-box">
+         <div id="size-slider"></div>
+      </div>
+      <hr>
+      <!-- Console: Clear Canvas & Reset Path Buttons -->
+      <div class="well" id="console">
+        <div class="style-choice butt"></div>
+        <div id="size-value">Size: 0</div>
+        <div id="alpha-value">Alpha: 0</div>
+        <button id="clear-canvas" class="btn">Clear Canvas</button>
+        <button id="toggle-canvas" class="btn">Toggle Canvas</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="well" id="target">
+        <div id="content">
+          
+            <iframe width="500" height="270" src="http://www.youtube.com/embed/PElhV8z7I60" frameborder="0" allowfullscreen></iframe>
+            <object type="application/x-shockwave-flash" height="300" width="400" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=basickz" bgcolor="#000000"><param name="allowFullScreen" value="true" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" /><param name="flashvars" value="hostname=www.twitch.tv&channel=basickz&auto_play=false&start_volume=25" /><param name="wmode" value="transparent"/></object>
+        </div>
+      </div>
+    
+      <footer>
+        <p>&copy; Ben Mays</p>
+        Proof of concept: Youtube and Justin.tv embedding is working. For Justin.tv, make sure to add the <code>&lt;param name="wmode" value="transparent"&gt;</code> param to your object.
+        
+      </footer></div>
+    </div> <!-- /container -->
+  </body>
+</html>
+<script>
+//Add Drawing Stuff
+Object.prototype.eventLogger.draw = function (eventObj) {
+            var position = eventObj.pos;
+            var offset = $("#eventLogger").offset(); 
+            position.x -= offset.left;
+            position.y -= offset.top;
+
+            if(eventObj.type == 'click' || eventObj.type  == 'mousedown') {
+              eventLogger.ctx.beginPath();
+            }
+
+            if(eventObj.type == 'mousemove') {
+               eventLogger.ctx.lineTo(position.x,position.y);
+               eventLogger.ctx.stroke();
+            }
+
+            if(eventObj.type == 'mouseup') {
+              eventLogger.ctx.stroke();
+              eventLogger.ctx.closePath();
+            }
+
+            if(eventObj.type == 'mousedown') {
+
+            }
+
+            if(eventObj.type == 'hover') {
+               
+            }
+
+            if(eventObj.type == 'dblclick') {
+              //do stuff
+              eventLogger.ctx.beginPath();
+              eventLogger.ctx.arc(position.x,position.y,10,0,Math.PI*2,true);
+              eventLogger.ctx.fill();
+              eventLogger.ctx.stroke();
+              eventLogger.ctx.closePath();
+            }
+}
+
+function drawInit () {
+  //canvas stuff
+  var target = $('#target');
+  $(target).append("<canvas id='eventLogger'></canvas>")
+
+  eventLogger.canvas = $('#eventLogger')[0]
+  eventLogger.ctx = eventLogger.canvas.getContext('2d');
+  eventLogger.ctx.lineJoin = "round";
+  eventLogger.ctx.lineWidth = 5;
+
+  //generate colors
+  //credit: http://www.krazydad.com/makecolors.php
+  function makeColorGradient(frequency1, frequency2, frequency3, phase1, phase2, phase3, center, width, len)
+  {
+      if (len == undefined)      len = 50;
+      if (center == undefined)   center = 128;
+      if (width == undefined)    width = 127;
+      var colors = new Array();
+      for (var i = 0; i < len; ++i)
+      {
+         var red = Math.sin(frequency1*i + phase1) * width + center;
+         var grn = Math.sin(frequency2*i + phase2) * width + center;
+         var blu = Math.sin(frequency3*i + phase3) * width + center;
+         colors.push({r:parseInt(red),g:parseInt(grn),b:parseInt(blu)});
+      }
+
+      return colors;
+  }
+  
+  //rainbow
+  var colors = makeColorGradient(1.66,2.66,3.4,0,0,0);
+  for( var i = 0; i < colors.length; i++ ) {
+     var color = colors[i];
+     var colorClass = 'c' + color.r + color.b + color.g;
+     color = "rgb("+color.r+", "+color.b+", "+color.g+")";
+
+     var html = "<div class='palette-choice' style='background-color:"+color+";'></div>";
+     if( i % 18 == 0)
+       html = '<br>' + html;
+     $('#detailed-palette').append(html)
+   }
+
+   //grayscale
+   $('#detailed-palette').append('<br>');
+   for( var i = 0; i < 255; i += 15) {
+    var color = color = "rgb("+i+", "+i+", "+i+")";
+    var html = "<div class='palette-choice' style='background-color:"+color+";'></div>";
+    $('#detailed-palette').append(html)
+   }
+
+  //Set width/height for canvas
+  eventLogger.canvas.width = $(target).outerWidth();
+  eventLogger.canvas.height = $(target).outerHeight();
+  $('#eventLogger').css($(target).offset());
+
+  //setup color chooser
+  $('.palette-choice').on('click', function (event) {
+
+      if(event.ctrlKey) {
+         eventLogger.ctx.fillStyle = $(this).css('background-color');
+         return;
+      }
+
+      if(event.altKey) {
+         eventLogger.ctx.strokeStyle = $(this).css('background-color');
+         return;
+      }
+
+      eventLogger.ctx.fillStyle = $(this).css('background-color');
+      eventLogger.ctx.strokeStyle = $(this).css('background-color');
+      $('#console>.style-choice').css('background-color', $(this).css('background-color'));
+  });
+  
+  //setup style chooser
+  $('.style-choice').on('click', function (event) {
+      var style = $(this).attr('class').split(' ')[1];
+      eventLogger.ctx.lineCap = style;
+      $('#console>.style-choice').attr('class', 'style-choice ' + style);
+  });
+
+  //setup size chooser & alpha sliders
+  $(function() {
+    $( "#size-slider" ).slider({
+      min: 0,
+      max: 100,
+      slide: function( event, ui ) {
+        eventLogger.ctx.lineWidth = ui.value/2;
+        $('#size-value').text('Size: ' + ui.value/2)
+      }
+    });
+
+    $( "#alpha-slider" ).slider({
+      min: 0,
+      max: 100,
+      slide: function( event, ui ) {
+        eventLogger.ctx.globalAlpha = ui.value/100;
+        $('#alpha-value').text('Alpha: ' + ui.value/100)
+      }
+    });
+  });
+
+  //setup console buttons
+  $('#clear-canvas').on('click', function () {
+    eventLogger.ctx.clearRect(0, 0, eventLogger.canvas.width, eventLogger.canvas.height);
+  })
+
+  $('#toggle-canvas').on('click', function () {
+    $('#eventLogger').toggle();
+  })
+
+  //setup video load button
+  $('#load-video').on('click', function () {
+    var src = $('#video-src-input').val();
+    $('#target>#content').html(src)
+  })
+
+  //setup detailed palette button
+  $('#toggle-detailed-palette').on('click', function () {
+    $('#detailed-palette').toggle();
+    if($(this).text() == "show more") {
+      $(this).text("hide");
+    }
+    else
+      $(this).text("show more");
+  })
+}
+
+$(document).ready( function () {
+  drawInit();
+  eventLogger.init();
+})
+</script>

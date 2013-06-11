@@ -1,0 +1,408 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title></title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<script src="js/libs/modernizr-2.5.3.min.js"></script>
+
+	<style media="screen">
+
+    .container {
+		width: 1024px;
+		height: 1000px;
+		-webkit-perspective: 1200px;
+		-moz-perspective: 1200px;
+		-ms-perspective: 1200px;
+		-o-perspective: 1200px;
+		perspective: 1200px;
+    }
+    
+    .card {
+		width: 512px;
+		height: 800px;
+		position: absolute;
+		-webkit-transition: -webkit-transform 0s;
+		-moz-transition: -moz-transform 0s;
+		-ms-transition: -ms-transform 0s;
+		-o-transition: -o-transform 0s;
+		transition: transform 0s;
+		-webkit-transform-style: preserve-3d;
+		-moz-transform-style: preserve-3d;
+		-ms-transform-style: preserve-3d;
+		-o-transform-style: preserve-3d;
+		transform-style: preserve-3d;
+    }
+
+    .page {
+    	padding: 5px;
+    	border: 1px solid #CCC;
+    	height: 788px;
+    	width: auto;
+    }
+
+    .card.left {
+    	margin-left: 0px;
+    }
+
+    .card.right {
+    	margin-left: 512px;
+    }
+    
+    .card .front, .card .back {
+    	overflow: hidden;
+		display: block;
+		height: 100%;
+		width: 512px;
+		line-height: 14px;
+		color: #333;
+		font-size: 14px;
+		position: absolute;
+		-webkit-backface-visibility: hidden;
+		-moz-backface-visibility: hidden;
+		-ms-backface-visibility: hidden;
+		-o-backface-visibility: hidden;
+		backface-visibility: hidden;
+		margin: 0px;
+		background: whiteSmoke;
+    }
+    
+    .card .front {
+
+    }
+    
+    .card .back {
+		-webkit-transform: rotateY( 180deg );
+		-moz-transform: rotateY( 180deg );
+		-ms-transform: rotateY( 180deg );
+		-o-transform: rotateY( 180deg );
+		transform: rotateY( 180deg );
+    }
+  </style>
+</head>
+<body>
+<header>
+
+</header>
+	<section class="container"></section>
+<footer>
+
+</footer>
+
+<script src="js/libs/jquery-1.7.2.js"></script>
+<script>
+var left, right, card, threshold;
+
+$(document).ready(function(){
+
+	$body = $("body");
+	$container = $(".container");
+
+	card = function(el, origin, options) {
+		this.el = el;
+		this.$el = $(el);
+		this.origin = origin;
+		this.originLeft = function () { return this.origin === "left"; }
+		this.originRight = function() { return this.origin === "right"; }
+		this.transformOrigin = function() { 
+			if(this.originLeft())
+				this.$el.css('-webkit-transform-origin', 'right center');
+
+			if(this.originRight())
+				this.$el.css('-webkit-transform-origin', 'left center');
+		}
+		this.rotate = function (angle) {
+			this.$el.css('-webkit-transform', 'rotateY( '+angle+'deg )');
+		}
+	}
+
+	//arrays acting as stacks, left stores the elements in the left pile.. etc.
+	left = [];
+	right = [];
+
+	//threshold for when a page is snapped to it's place.
+	threshold = .9;
+
+	//generate some cards and append them to the dom
+	generateCards();
+
+	var currTargetX;
+	var currCard = null;
+	var currCardOrigin = null;
+	var rotation;
+	var dir;
+
+	$body.bind('mousedown', startDrag)
+
+	function startDrag(e) {
+		e.preventDefault();
+		$body.bind('mousemove', updateDrag);
+		$body.bind('mouseup', stopDrag);
+
+		//save the position the user clicked on to begin the drag.
+		currTargetX = e.pageX;
+	}
+
+
+	function updateDrag(e) {
+		e.preventDefault();
+
+		var targetX = e.pageX;
+		function isInBounds(leftBound, rightBound) {
+			return (targetX > leftBound && targetX < rightBound)
+		}
+		dir = (targetX < currTargetX) ? 'left' : 'right';
+		var perc = (targetX - $container.offset().left) / $container.width();
+
+		//If we've clicked and there is no card selected, figure out which one the user wanted.
+		if(currCard === null) {
+
+			if(dir === 'left' && right.length <= 0 || dir === 'right' && left.length <= 0) { 
+				stopDrag(); 
+				return; 
+			}
+
+			if(dir === 'left' && right.length > 0) {
+				console.log('here');
+				var c = right[right.length-1];
+				var cLeftX = c.$el.offset().left;
+				var cRightX = cLeftX + c.$el.width();
+
+				if(isInBounds(cLeftX, cRightX))
+					currCard = right.pop();
+				else {
+					stopDrag();
+					return;
+				}
+			}
+
+			if(dir === 'right' && left.length > 0) {
+				console.log('here');
+				var c = left[left.length-1];
+				var cLeftX = c.$el.offset().left;
+				var cRightX = cLeftX + c.$el.width();
+				
+				if(isInBounds(cLeftX, cRightX))
+					currCard = left.pop();
+				else {
+					stopDrag();
+					return;
+				}
+			}
+
+
+		}
+
+		//if mouse goes out of bounds of container, snap to either 1 or 0.
+		perc = Math.min(1, perc);
+		perc = Math.max(0, perc);
+
+		//ensure currCard is ontop of both left and right stacks
+		currCard.$el.css('z-index', '1000').css('-webkit-transition', '.001s');
+
+		if(currCard.originLeft())
+			rotation = 180 * perc;
+		else
+			rotation = -(180 * (1-perc));
+
+		currCard.transformOrigin();
+		currCard.rotate(rotation);
+
+		//moving right
+		if(dir === 'right') {
+			//card started on the left
+			if(currCard.originLeft()) {
+				if(rotation >= (180 * threshold) ) {
+					snapCard(currCard, 180, right)
+					return;
+				}
+			}
+
+			//card started on the right
+			if(currCard.originRight()) {
+								console.log(rotation)
+				console.log((180 * threshold))
+				if(Math.abs(rotation) <= (180 - (180 * threshold)) ) {
+					snapCard(currCard, 0, right)
+					return;
+				}
+			}
+		}
+
+		//moving left
+		if(dir === 'left') {
+			//If moving right to left, left origin
+			if(currCard.originLeft()) {
+				if(rotation <= (180 - (180 * threshold)) ) {
+					snapCard(currCard, 0, left)
+					return;
+				}
+
+			}
+
+			//If moving right to left, right origin
+			if(currCard.originRight()) {
+				console.log(rotation)
+				console.log((180 * threshold))
+				if(Math.abs(rotation) >= (180 * threshold) ) {
+					snapCard(currCard, -180, left)
+					return;
+				}
+
+			}
+		}
+	}
+
+	function stopDrag(e) {
+		$body.unbind('mousemove');
+		$body.unbind('mouseup');
+
+		/*if(currCard) {
+			console.log(rotation);
+			var angle = Math.abs(rotation);
+			var r = Math.min(rotation, 180)
+			r = Math.max(r, 0);
+
+			console.log(r);
+			if(dir === 'left' && currCard.originLeft())
+				snapCard(currCard, r, left);
+		}*/
+	}
+
+	function snapCard(card, angle, array) {
+		card.$el.css('-webkit-transition', '1s');
+		card.rotate(angle);
+		array.push(card);
+		updateZIndex();
+		currCard = null;
+		stopDrag();
+	}
+
+	//Iterates through stack and assigns z-index values based on position.
+	function updateZIndex() {
+		for( var i = 0; i < left.length; i++ )
+			left[i].$el.css('z-index', i);
+
+		for( var i = 0; i < right.length; i++ ) 
+			right[i].$el.css('z-index', i);
+	}
+
+	function generateCards() {
+		var $left = $("<div class='left-page'></div>");
+		var $right = $("<div class='right-page'></div>");
+		for( var i = 0; i < 10; i++) {
+
+			var $card = $("<div class='card'></div>");
+			$card.addClass('c' + i);
+			$card.append('<div class="front">' + $(".page:first").parent().html() + "</div><div class='back'>" + $(".page:last").parent().html() + "</div>");
+
+			if(i % 2 === 0){
+				$card.addClass('right');
+				var c = new card($card, 'right');
+				right.push(c);
+				$right.append($card);
+			}
+			else {
+				$card.addClass('left');
+				var c = new card($card, 'left');
+				left.push(c);
+				$left.append($card);
+			}
+
+			//$container.append($card);
+		}
+
+		$container.append($left).append($right);
+
+	}
+});
+
+</script>
+</body>
+<footer>
+	<div>
+		<div class="page">
+			<div class="page-header">
+				<h1>Front Header</h1>
+			</div>
+			<hr/>
+			<div class="page-articles">
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.universetoday.com/95242/launch-day-timeline-for-spacexs-dragon/">Launch Day Timeline for SpaceX's Dragon</a>
+					</div>
+					<div class="subtitle">
+						<p>Saturday morning's launch window for SpaceX's historic test flight to the International Space Station lasts just one second. Company President Gwynne Shotwell predicted they have "better than a 50-50 shot on whether we lift off tomorrow," she said ...</p>
+					</div>
+					<div class="source">
+					Universe Today
+					</div>
+				</div>
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.huffingtonpost.com/2012/05/19/spacex-launch-abort-faulty-rocket-valve_n_1530487.html">SpaceX Launch Abort Traced To Faulty Rocket Engine Valve</a>
+					</div>
+					<div class="subtitle">
+						<p>This story was updated at 6:15 p.m. EDT. CAPE CANAVERAL, Fla. -- A failed rocket engine valve appears to be responsible for the unexpected abort of a private SpaceX rocket launch before dawn on Saturday (May 19), officials said. Dragon was due ...</p>
+					</div>
+					<div class="source">
+						Huffington Post
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			<hr/>
+			<div class="page-footer">
+				Test Footer
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="page">
+			<div class="page-header">
+				<h1>Back Header</h1>
+			</div>
+			<hr/>
+			<div class="page-articles">
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.universetoday.com/95242/launch-day-timeline-for-spacexs-dragon/">Launch Day Timeline for SpaceX's Dragon</a>
+					</div>
+					<div class="subtitle">
+						<p>Saturday morning's launch window for SpaceX's historic test flight to the International Space Station lasts just one second. Company President Gwynne Shotwell predicted they have "better than a 50-50 shot on whether we lift off tomorrow," she said ...</p>
+					</div>
+					<div class="source">
+					Universe Today
+					</div>
+				</div>
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.huffingtonpost.com/2012/05/19/spacex-launch-abort-faulty-rocket-valve_n_1530487.html">SpaceX Launch Abort Traced To Faulty Rocket Engine Valve</a>
+					</div>
+					<div class="subtitle">
+						<p>This story was updated at 6:15 p.m. EDT. CAPE CANAVERAL, Fla. -- A failed rocket engine valve appears to be responsible for the unexpected abort of a private SpaceX rocket launch before dawn on Saturday (May 19), officials said. Dragon was due ...</p>
+					</div>
+					<div class="source">
+						Huffington Post
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			<hr/>
+			<div class="page-footer">
+				Test Footer
+			</div>
+		</div>
+	</div>
+</footer>
+</html>

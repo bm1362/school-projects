@@ -1,0 +1,290 @@
+
+<html>
+	<head>
+		<style>
+
+			html,body {
+				font-family: Roboto, sans-serif;
+				font-size: 17px;
+				
+			}
+
+			* {
+				margin: 0px;
+				padding: 0px;
+			}
+
+			body {
+				background: url('call.jpg');
+				background-position: 100% 50%;
+				background-repeat: no-repeat;
+			}
+
+			#container {
+				background-color: rgba(0, 0, 0, .9);
+				height: 100%;
+				max-height: 100%;
+				width: 27.5%;
+				position: absolute;
+				border-right: 2px dotted rgba(150, 150, 150, .5);
+			}
+
+			#info-pane {
+				height: auto;
+				width: 100%;	
+				margin-top: 20%;
+				color: white;
+				text-align: right;
+				
+			}
+			#info-pane div {
+
+			}
+			#upcoming-calendar {
+				width: 100%;
+				vertical-align: middle;
+				line-height: 100%;
+				font-size: 1.5em;
+				padding-top: 15px;
+				padding-bottom: 15px;
+				background-color: #99CC00;
+				color: #333;
+			}
+
+			.accordion {
+				height: auto;
+				width: 100%;
+				overflow-y: auto;
+				overflow-x: hidden;
+				margin-top: 5px;
+
+			}
+
+			#time {
+				width: 100%;
+				vertical-align: middle;
+				line-height: 100%;
+				font-size: 1.5em;
+				padding-top: 15px;
+				padding-bottom: 15px;
+				background-color: #FFBB33;
+				color: #333;
+				display: none;
+			}
+
+			.accordion .accordion-list-title{
+				width: 100%;
+				height: 40px;
+				text-align: left;
+				text-indent: 10%;
+				vertical-align: middle;
+				line-height: 40px;
+				color: #BBB;
+				cursor: pointer;
+			}
+
+			.accordion .active{
+				color: white;
+				background: #282828;
+			}
+
+			.accordion .accordion-list {
+				list-style: none;
+				width: 100%;
+				height: auto;
+				max-height: 250px;
+				overflow: auto;
+			}
+
+			.accordion .accordion-list-index {
+				color: #33B5E5;
+				width: 100%;
+				height: 30px;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				border-bottom: 1px solid rgba(217, 217, 217, .1);
+				text-align: left;
+				text-indent: 35%;
+				vertical-align: middle;
+				line-height: 30px;
+				font-size: 1em;
+				cursor: pointer;
+			}
+
+			.accordion .accordion-list-index:active {
+				color: #0099CC;
+				background: rgba(51, 51, 51, .3);
+			}
+
+			.section-divider {
+				font-weight: bold;
+				text-transform: uppercase;
+				font-size: 13px;
+				color: #aaa;
+				margin: 0;
+				line-height: 1;
+				letter-spacing: 1px;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<div id="info-pane">
+				<div id="upcoming-calendar">
+					<div style="margin-right: 10px">Next Meeting:</div>
+					<div style="font-size: 40px; margin-top: 5px; margin-right: 10px">10 Minutes</div>
+				</div>
+				<div id="time">
+					<span style="">10:04 AM</span>
+				</div>
+			</div>
+			<div class="accordion">
+				<div data-list-id="1" class="section-divider">Content</div>
+				<ul data-id="1">
+					<li>Laptop</li>
+					<li>Document Camera</li>
+					<li>DVD Player</li>
+					<li>PC</li>
+				</ul>
+				<div data-list-id="2" class="section-divider">Cameras</div>
+				<ul data-id="2">
+					<li>Far Site</li>
+					<li>Local Site</li>
+				</ul>
+				<div data-list-id="3" class="section-divider">Add a Call</div>
+				<ul data-id="3">
+					<li>Everett H.</li>
+					<li>Ben M.</li>
+					<li>Scott C.</li>
+				</ul>
+			</div>
+		</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	</body>
+</html>
+
+
+<script>
+(function( $ ){
+	var supportsTouch = 	'createTouch' in document,
+		cursorDownEvent = 	supportsTouch ? 'touchstart.slider' : 'mousedown.slider',
+		cursorMoveEvent = 	supportsTouch ? 'touchmove.slider' : 'mousemove.slider',
+		cursorUpEvent = 	supportsTouch ? 'touchend.slider' : 'mouseup.slider';
+	
+	function animate ($el, x, y, z, dur) {
+		$el.css('-webkit-transition', '-webkit-transform ' + dur||".5s")
+		$el.css('-webkit-transform', 'translate3d('+x+'px,'+y+'px,'+z+'px)')
+	}
+
+	function getList($title) {
+		var listID = $title.attr('data-list-id');
+		var list = $(".accordion-list[data-id='"+listID+"']");
+		return list;
+	}
+
+	function getTitle($list) {
+		var id = $list.attr('data-id');
+		var title = $(".accordion-list-title[data-list-id='"+id+"']");
+		return title;
+	}
+
+	$.fn.accordion = function( options ) {
+
+		var $el = this;
+
+		if(supportsTouch)
+			$("body").attr("ontouchstart", "");
+
+	    // Create some defaults, extending them with any options that were provided
+	    var settings = $.extend( {
+
+	    }, options);
+
+	    var parents = $("ul", $el);
+	    var children = $("li", $el);
+	    var titles = $("div", $el);
+
+	    parents.addClass('accordion-list');
+	    children.addClass('accordion-list-index');
+	    titles.addClass("accordion-list-title")
+
+	    $.each(parents, function() {
+	    	var list = $(this);
+	    	var id = list.attr('data-id');
+	    	
+	    	//find matching title element
+	    	var title = getTitle(list);
+
+	    	//add event to title element
+	    	title.on(cursorDownEvent, function(e) {
+	    		e.preventDefault();
+
+	    		if(list.queue().length > 1)
+	    			return;
+
+	    		//on click flip state
+	    		var isOpen = list.data().isOpen;
+	    		isOpen = !isOpen;
+	    		list.data('isOpen', isOpen);
+
+	    		//close other actives
+	    		var actives = $(".accordion-list-title.active")
+
+	    		$.each(actives, function () {
+	    			var $title = $(this)
+	    			var $list = getList($title);
+
+	    			if(list.data().id !== $list.data().id) {
+	    				$title.removeClass('active')
+	    				$list.data('isOpen', false);
+	    				$list.animate({
+	    					height: "hide"
+	    				}, 300)
+
+	    			}
+	    		})
+
+	    		if(isOpen) {
+	    			title.addClass('active')
+	    			//do animation
+		    		list.animate({
+		    			height: "show"
+		    		}, 300)
+	    		}
+	    		else {
+	    			title.removeClass('active')
+	    			list.animate({
+		    			height: "hide"
+		    		}, 300)
+	    		}	    		
+	    	});
+
+	    	//set state
+	    	list.data('isOpen', false);
+
+	    	//close list
+	    	list.animate({
+	    			height: "hide"
+	    	}, 0)
+
+
+
+	    });
+
+		$el.on(cursorDownEvent, function(e) {
+			e.preventDefault();
+		})
+
+		//$(".accordion-list").on(cursorDownEvent, function(e){
+		//	e.preventDefault();
+		//})
+
+	    return this;
+
+	};
+})( jQuery );
+
+$(".accordion").accordion()
+
+</script>

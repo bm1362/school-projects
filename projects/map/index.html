@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Map Prototype</title>
+        <link rel="stylesheet" href="./css/bootstrap.css" type="text/css">
+        <link rel="stylesheet" href="./css/style.css" type="text/css">
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="toolbar" class="panel corners">
+
+                <div id="admin">
+                    <h3>Active Map:</h3>
+                    <select id="map-select"></select>
+                    <div id="act-map"></div>
+                    <hr/>
+                    <button id="new-region" class="btn btn-primary">New Region</button>
+                    <hr/>
+                    <h3>Active Region:</h3>
+                    <ul id="act-region"></ul>
+                    <button id="lock-region" class="btn btn-secondary">Lock Region</button>
+                    <button id="to-front-region" class="btn btn-secondary">Bring to Front</button>
+                    <button id="del-region" class="btn btn-danger">Delete Region</button>
+                </div>
+                <hr/>
+                <div id="client">
+                    <input type="search" placeholder="Search.."></input>
+                    <button class="btn btn-small" id="search-submit">Go</button>
+
+                    <hr/>
+                    <div class="search-results">
+                        <h3>Results</h3>
+                    </div>
+                </div>
+
+            </div>
+            <div id="firstfloor" class="map panel corners">
+                <div class="map-bg">
+                    <img src="img/firstfloor.jpg"></img>
+                </div>
+            </div>
+            <div id="secondfloor" class="map panel corners">
+                <div class="map-bg">
+                    <img src="img/firstfloor.jpg"></img>
+                </div>
+            </div>
+            <div id="thirdfloor" class="panel corners">
+            </div>
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
+        <script src="./js/lib/bootstrap.js" type="text/javascript"></script>
+        <script src="./js/lib/bootstrap-tooltip.js" type="text/javascript"></script>
+        <script src="./js/lib/bootstrap-popover.js" type="text/javascript"></script>
+        <script src="./js/lib/raphael-min.js" type="text/javascript"></script>
+
+        <script src="./js/app.js" type="text/javascript"></script>
+        <script src="./js/map.js" type="text/javascript"></script>
+        <script src="./js/region.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            function init()
+            {
+                App.init();
+
+                $(".map").each(function(e){
+                    var m = new App.Map(this);
+                    App.maps[m.id] = m;
+                    $("#map-select").append("<option data-map-id='"+m.id+"''>" + $(this).attr('id') + "</option>")
+                    $(this).data('map-id', m.id)
+                });
+
+                //bind button events
+                $("#new-region").click(function(e){
+                    var r = new App.Region(App.activeMap, {});
+                    App.activeMap.regions[r.id] = r;
+                });
+
+                $("#del-region").click(function(e){
+                    App.activeRegion.destroy();
+                });
+
+                $("#lock-region").click(function(e){
+                    App.activeRegion.toggleLock();
+                });
+
+                $("#to-front-region").click(function(e){
+                    App.activeRegion.set.toFront()
+                });
+
+                $("svg").click(function(e){
+                    var offset = $(this).offset()
+
+                    if(e.ctrlKey && App.isAdmin) {
+                        var currentID = $(this).data('map-id');
+                        var currentMap = App.maps[currentID];
+                        var r = new App.Region(currentMap, {x: e.pageX - offset.left, y: e.pageY - offset.top});
+                        App.maps[currentID].regions[r.id] = r;
+                    }
+                })
+                
+            }
+
+            if (document.addEventListener) document.addEventListener("DOMContentLoaded", init, false);
+            else if (document.attachEvent) document.attachEvent("onreadystatechange", init);
+            else window.onload = autorun;
+
+
+
+        </script>
+    </body>
+</html>

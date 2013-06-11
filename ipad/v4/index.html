@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<title>Mars iPad Mock Up</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  	<meta http-equiv=imagetoolbar content=false>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+	<!-- CSS
+  ================================================== -->
+	<link rel="stylesheet" href="stylesheets/base.css">
+	<link rel="stylesheet" href="stylesheets/skeleton.css">
+	<link rel="stylesheet" href="stylesheets/layout.css">
+
+	<link rel="stylesheet" href="stylesheets/views/home.css">
+	<link rel="stylesheet" href="stylesheets/views/call.css">
+
+	<link rel="stylesheet" href="stylesheets/slider.css">
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+</head>
+<body ontouchstart="">
+	<!-- Primary Page Layout
+	================================================== -->
+
+	<div class="container" id="container">
+		<div id="dock-top"></div>
+		<div class="main-panel" id="main"></div>
+		<div id="dock-bottom"></div>
+		<div id="leftMenu" class="menu"></div>
+		<div id="rightMenu" class="menu"></div>
+	</div><!-- container -->
+
+	<!-- JS
+	================================================== -->
+	<script src="javascripts/libs/jquery-1.7.2.min.js"></script>
+	<script src="javascripts/libs/jquery.slider.js"></script>
+	<script src="javascripts/libs/underscore-min.js"></script>
+	<script src="javascripts/libs/backbone-min.js"></script>
+	<script src="javascripts/app.js"></script>
+
+	<script type="text/html" id="home_main">
+		<div id="home-search-bar">
+			<form>
+			  <input type="text" placeholder="Search" id="home-search-contacts"/>
+			</form>
+		</div>
+		<div id="home-speed-dial">
+			<div class="home-speed-dial-panel"></div>
+			<div class="home-speed-dial-panel"></div>
+			<div class="home-speed-dial-panel"></div>
+			<div class="home-speed-dial-panel"></div>
+		</div>
+		<div id="home-sys-opts">
+			<div id="home-sys-opts-btn-wrapper">
+				<div class="home-sys-opts-button" id="home-sys-opts-call">
+					<div>Call</div>
+					<img src="images/call_normal.png" width="100px" height="100px"></img>
+				</div>
+				<div class="home-sys-opts-button" id="home-sys-opts-menu">
+					<div>Menu</div>
+					<img src="images/menu_normal.png" width="100px" height="100px"></img>
+				</div>
+				<div class="home-sys-opts-button" id="home-sys-opts-present">
+					<div>Present</div>
+					<img src="images/content_normal.png" width="100px" height="100px"></img>
+				</div>
+			</div>
+		</div>
+		<div id="home-remote-opts">	
+			<div class="home-remote-opts-button" id="home-remote-opts-mute">
+				<img src="images/call_normal.png" width="50px" height="65px"></img>
+				<div>Mute</div>
+			</div>
+			<div class="home-remote-opts-button" id="home-remote-opts-cameras">
+				<img src="images/call_normal.png" width="50px" height="65px"></img>
+				<div>Cameras</div>
+			</div>
+			<div class="home-remote-opts-button" id="home-remote-opts-volume">
+				<img src="images/call_normal.png" width="50px" height="65px"></img>
+				<div>Volume</div>
+			</div>
+		</div>
+	</script>
+
+	<script type="text/html" id="home_left_menu">
+		<ul>
+		</ul>
+	</script>
+
+	<script type="text/html" id="home_right_menu">
+		<ul>
+		</ul>
+	</script>
+
+	<script type="text/html" id="home_dock_top">
+		<div id="current-room" class="dock-item float-left">
+			Shoal Creek
+		</div>
+		<div id="current-datetime" class="dock-item float-right">
+			Wednesday, June 13th 2012 | 1:30 PM 
+		</div>
+	</script>
+
+	<script type="text/html" id="home__dock_bottom">
+	</script>
+
+	<script type="text/html" id="call_main">
+		<div id="call-record-button">Record</div>
+		<div id="call-mute-button">
+			<div id="call-mute-button-icon">
+				<img src="images/call_normal.png" width="100px" height="100px"></img>
+				Mute
+			</div>
+		</div>
+		<div id="call-end-button">End Call</div>
+		<div id="call-main">
+			<div id="call-status"></div>
+			<div id="call-monitor-display"></div>
+			<div id="call-progress-bar">
+				<div id="call-progress-bar-action">Calling....</div>
+				<div id="call-progress-bar-end">Quarterly Earnings Report</div>
+				<div id="call-progress-bar-btn">Cancel</div>
+			</div>
+		</div>
+		<div id="call-opts">
+			<div class="call-opts-btn">
+				<img src="images/call_normal.png" width="75px" height="75px"></img>
+				<div>Placed Joined</div>
+			</div>
+			<div class="call-opts-btn">
+				<img src="images/call_normal.png" width="75px" height="75px"></img>
+				<div>People Joined</div>
+			</div>
+			<div class="call-opts-btn" id="call-opts-vol">
+				<div id="call-opts-vol-slider" class="slider">
+					<div style="margin-top: 100px; width: 100%; text-align: center;">Volume</div>
+				</div>
+				
+			</div>
+			<div class="call-opts-btn">
+				<img src="images/call_normal.png" width="75px" height="75px"></img>
+				<div>Hold</div>
+			</div>
+			<div class="call-opts-btn">
+				<img src="images/call_normal.png" width="75px" height="75px"></img>
+				<div>Transfer</div>
+			</div>
+		</div>
+	</script>
+
+	<script type="text/html" id="call_left_menu">
+		<ul>
+		</ul>
+	</script>
+
+	<script type="text/html" id="call_right_menu">
+		<ul>
+		</ul>
+	</script>
+
+	<script type="text/html" id="call_dock_top">
+		<div id="left-menu-button" class="dock-item float-left">
+			<a href="#">Menu</a>
+		</div>
+		<div id="current-room" class="dock-item float-left">
+			Shoal Creek
+		</div>
+		<div id="current-datetime" class="dock-item float-right">
+			Wednesday, June 13th 2012 | 1:30 PM 
+		</div>
+	</script>
+
+	<script type="text/html" id="call__dock_bottom">
+	</script>
+
+<!-- End Document
+================================================== -->
+</body>
+</html>

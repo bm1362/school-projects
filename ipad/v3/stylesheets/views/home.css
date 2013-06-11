@@ -1,0 +1,102 @@
+#home-search-bar {
+	height: 50px;
+	width: 100%;
+	position: fixed;
+	top: 40px;
+	background: rgba(14, 63, 112, .5);
+	text-align: center;
+	line-height: 50px;
+	border-bottom: 1px solid rgba(14, 63, 112, .5);
+	z-index: 1100;
+}
+
+#home-search-bar form {
+	margin: 0px;
+	padding: 0px;
+	margin: auto;
+	display: inline-block;
+	z-index: 1110;
+}
+
+#home-search-bar form input{
+
+}
+
+#home-speed-dial {
+	height: 150px;
+	width: 100%;
+	position: fixed;
+	top: 90px;
+	background: rgba(14, 63, 112, .5);
+	display: inline-block;
+	overflow: hidden;
+}
+
+.home-speed-dial-panel {
+	float: left;
+	height: 100%;
+	width: 25%;
+	display: inline-block;
+	padding: 0px;
+	margin: 0px;
+	border: 1px solid rgba(14, 63, 112, .5);
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#home-sys-opts {
+	height: 115px;
+	width: 30%;
+	left: 35%;
+	position: fixed;
+	min-width: 300px;
+	bottom: 40px;
+}
+
+#home-sys-opts-btn-wrapper {
+	margin: auto;
+	width: 300px;
+	height: 100%;
+}
+.home-sys-opts-button {
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+	display: inline-block;
+	width: 100px;
+	height: 100%;
+	overflow: hidden;
+	float: left;
+	text-align: center;
+	color: white;
+	margin: 0px;
+	text-shadow: 0px 1px 1px black;
+}
+
+.home-sys-opts-button img {
+
+}
+
+#home-remote-opts {
+	height: 100px;
+	width: 250px;
+	right: 25px;
+	position: fixed;
+	bottom: 0px;
+}
+
+.home-remote-opts-button {
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+	display: inline-block;
+	width: 33.333%;
+	height: 100px;
+	overflow: hidden;
+	float: left;
+	text-align: center;
+	color: white;
+	margin: 0px;
+	text-shadow: 0px 1px 1px black;
+}

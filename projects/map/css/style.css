@@ -1,0 +1,78 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+body { 
+	background: #EEE url('../img/rough_diagonal.png');
+	font: 14px 'Proxima Nova', Arial, sans-serif !important;
+	line-height: 1.4em;
+	color: #4D4D4D;
+}
+
+body, p, a, div, label {
+	font-family:'Proxima Nova', Arial, sans-serif;
+}
+
+.wrapper {
+	min-width: 940px;
+	padding-bottom: 50px;
+}
+
+.map {
+	margin-top: 50px;
+	min-height: 400px;
+	width: 1280px;
+	margin-left: 340px;
+	margin-bottom: 50px;
+}
+
+.map-bg {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -5000;
+}
+
+#toolbar {
+	position: fixed;
+	left: 10px;
+	top: 50px;
+	width: 300px;
+}
+
+.panel {
+	padding: 10px;
+	background: #FFF;
+	border: 1px solid rgba(219, 221, 223, .3);
+	box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.15)
+}
+
+.corners {
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+}
+
+.float-left {}
+.float-right {}
+.no-float {
+	float: none;
+}
+
+svg .region {}
+svg .drag { cursor:move }
+svg .sizer { fill:#111; stroke:#000;}
+
+
+.btn {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+#search-submit {
+	width: auto;
+}

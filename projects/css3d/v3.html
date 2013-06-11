@@ -1,0 +1,308 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title></title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+	<script src="js/libs/modernizr-2.5.3.min.js"></script>
+
+	<style media="screen">
+    .container {
+		width: 1000px;
+		height: 1000px;
+		position: relative;
+		margin: 0 auto 40px;
+		border: 1px solid #CCC;
+		display: inline-block;
+		-webkit-perspective: 1200px;
+		-moz-perspective: 1200px;
+		-ms-perspective: 1200px;
+		-o-perspective: 1200px;
+		perspective: 1200px;
+    }
+    
+    .card {
+		width: 500px;
+		height: 800px;
+		position: absolute;
+		-webkit-transition: -webkit-transform 1s;
+		-moz-transition: -moz-transform 1s;
+		-ms-transition: -ms-transform 1s;
+		-o-transition: -o-transform 1s;
+		transition: transform 1s;
+		-webkit-transform-style: preserve-3d;
+		-moz-transform-style: preserve-3d;
+		-ms-transform-style: preserve-3d;
+		-o-transform-style: preserve-3d;
+		transform-style: preserve-3d;
+    }
+
+    .card.left {
+    	margin-left: 0px;
+    }
+
+    .card.right {
+    	margin-left: 500px;
+    }
+
+    .card.left-flipped {
+    	-webkit-transform-origin: left center;
+    	-webkit-transform: rotateY( -180deg ) translateX( -200px ) ;
+    	-moz-transform: translateX( 0px ) rotateY( -180deg );
+		-ms-transform: translateX( 0px ) rotateY( -180deg );
+		-o-transform: translateX( 0px ) rotateY( -180deg );
+		transform: translateX( 0px ) rotateY( -180deg );
+    }
+
+    .card.right-flipped {
+    	-webkit-transform-origin: right center;
+    	-webkit-transform: rotateY( 180deg );
+    	-moz-transform: translateX( 200px ) rotateY( 180deg );
+		-ms-transform: translateX( 200px ) rotateY( 180deg );
+		-o-transform: translateX( 200px ) rotateY( 180deg );
+		transform: translateX( 200px ) rotateY( 180deg );
+    }
+    
+    .card figure {
+    	overflow: hidden;
+		display: block;
+		height: 100%;
+		width: 100%;
+		line-height: 260px;
+		color: white;
+		text-align: center;
+		font-weight: bold;
+		font-size: 14px;
+		position: absolute;
+		-webkit-backface-visibility: hidden;
+		-moz-backface-visibility: hidden;
+		-ms-backface-visibility: hidden;
+		-o-backface-visibility: hidden;
+		backface-visibility: hidden;
+		margin: 0px;
+    }
+    
+    .card .front {
+		background: red;
+    }
+    
+    .card .back {
+		background: blue;
+		-webkit-transform: rotateY( 180deg );
+		-moz-transform: rotateY( 180deg );
+		-ms-transform: rotateY( 180deg );
+		-o-transform: rotateY( 180deg );
+		transform: rotateY( 180deg );
+    }
+  </style>
+</head>
+<body>
+<header>
+
+</header>
+	<section class="container"></section>
+<footer>
+
+</footer>
+
+<script src="js/libs/jquery-1.7.2.js"></script>
+<script>
+var left, right, card, threshold;
+
+$(document).ready(function(){
+
+	$body = $("body");
+	$container = $(".container");
+
+	card = function(el, origin, options) {
+		this.el = el;
+		this.$el = $(el);
+		this.origin = origin;
+		this.originLeft = function () { return this.origin === "left"; }
+		this.originRight = function() { return this.origin === "right"; }
+		this.transformOrigin = function() { 
+			if(this.originLeft())
+				this.$el.css('-webkit-transform-origin', 'right center');
+
+			if(this.originRight())
+				this.$el.css('-webkit-transform-origin', 'left center');
+		}
+		this.rotate = function (angle) {
+			this.$el.css('-webkit-transform', 'rotateY( '+angle+'deg )');
+		}
+	}
+
+	//arrays acting as stacks, left stores the elements in the left pile.. etc.
+	left = [];
+	right = [];
+
+	//threshold for when a page is snapped to it's place.
+	threshold = .5;
+
+	//generate some cards and append them to the dom
+	generateCards();
+
+	var currTargetX;
+	var currCard = null;
+	var currCardOrigin = null;
+
+	$body.bind('mousedown', startDrag)
+
+	function startDrag(e) {
+		e.preventDefault();
+		$body.bind('mousemove', updateDrag);
+		$body.bind('mouseup', stopDrag);
+
+		//save the position the user clicked on to begin the drag.
+		currTargetX = e.pageX;
+	}
+
+	function updateDrag(e) {
+		e.preventDefault();
+
+		var targetX = e.pageX;
+		var dir = (targetX < currTargetX) ? 'left' : 'right';
+		var perc = targetX / $container.width();
+
+		//If we've clicked and there is no card selected, figure out which one the user wanted.
+		if(currCard === null) {
+
+			if(dir === 'left' && right.length <= 0 || dir === 'right' && left.length <= 0) { 
+				stopDrag(); 
+				return; 
+			}
+
+			if(dir === 'left' && right.length > 0) {
+				currCard = right.pop();
+			}
+
+			if(dir === 'right' && left.length > 0) {
+				currCard = left.pop();
+			}
+		}
+
+		//if mouse goes out of bounds of container, snap to either 1 or 0.
+		perc = Math.min(1, perc);
+		perc = Math.max(0, perc);
+
+		//ensure currCard is ontop of both left and right stacks
+		currCard.$el.css('z-index', '1000')
+
+		var rotation;
+		if(currCard.originLeft())
+			rotation = 180 * perc;
+		else
+			rotation = -(180 * (1-perc));
+
+		currCard.transformOrigin();
+		currCard.rotate(rotation);
+
+		//moving right
+		if(dir === 'right') {
+			//card started on the left
+			if(currCard.originLeft()) {
+				if(rotation >= (180 * threshold) ) {
+					snapCard(currCard, 180, right)
+					return;
+				}
+			}
+
+			//card started on the right
+			if(currCard.originRight()) {
+								console.log(rotation)
+				console.log((180 * threshold))
+				if(Math.abs(rotation) <= (180 - (180 * threshold)) ) {
+					snapCard(currCard, 0, right)
+					return;
+				}
+			}
+		}
+
+		//moving left
+		if(dir === 'left') {
+			//If moving right to left, left origin
+			if(currCard.originLeft()) {
+				if(rotation <= (180 - (180 * threshold)) ) {
+					snapCard(currCard, 0, left)
+					return;
+				}
+
+			}
+
+			//If moving right to left, right origin
+			if(currCard.originRight()) {
+				console.log(rotation)
+				console.log((180 * threshold))
+				if(Math.abs(rotation) >= (180 * threshold) ) {
+					snapCard(currCard, -180, left)
+					return;
+				}
+
+			}
+		}
+	}
+
+	function stopDrag(e) {
+		$body.unbind('mousemove');
+		$body.unbind('mouseup');
+	}
+
+	function snapCard(card, angle, array) {
+		card.rotate(angle);
+		array.push(card);
+		updateZIndex();
+		currCard = null;
+		stopDrag();
+	}
+
+	//Iterates through stack and assigns z-index values based on position.
+	function updateZIndex() {
+		for( var i = 0; i < left.length; i++ )
+			left[i].$el.css('z-index', i);
+
+		for( var i = 0; i < right.length; i++ ) 
+			right[i].$el.css('z-index', i);
+	}
+
+	function generateCards() {
+		var $left = $("<div class='left-page'></div>");
+		var $right = $("<div class='right-page'></div>");
+		for( var i = 0; i < 10; i++) {
+
+			var $card = $("<div class='card'></div>");
+			$card.addClass('c' + i);
+			$card.append('<figure class="front">' +  i + "</figure><figure class='back'>" + i + "</figure>");
+
+			if(i % 2 === 0){
+				$card.addClass('right');
+				var c = new card($card, 'right');
+				right.push(c);
+				$right.append($card);
+			}
+			else {
+				$card.addClass('left');
+				var c = new card($card, 'left');
+				left.push(c);
+				$left.append($card);
+			}
+
+			//$container.append($card);
+		}
+		var $divider = $("<div class='divider'></div>")
+		$container.append($left).append($divider).append($right);
+
+	}
+});
+
+</script>
+</body>
+</html>

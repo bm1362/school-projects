@@ -1,0 +1,413 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title></title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<script src="js/libs/modernizr-2.5.3.min.js"></script>
+
+	<style media="screen">
+
+	body {
+		background: #333;
+		z-index: -1;
+	}
+
+    .container {
+    	width: 1200px;
+    	margin-top: 50px;
+    	height: 800px;
+		-webkit-perspective: 1200px;
+		-moz-perspective: 1200px;
+		-ms-perspective: 1200px;
+		-o-perspective: 1200px;
+		perspective: 1200px;
+    }
+
+    .scene {
+
+    }
+
+    .page-header{
+    	text-align: center;
+    }
+    .page-number {
+    	padding: 10px;
+    }
+
+    .page-number, .page-header, .page-articles, .page-footer {
+    	padding-left: 10px;
+    }
+
+    .float-left {
+    	float: left;
+    }
+
+    .float-right {
+    	float: right;
+    }
+    
+    .page {
+    	margin: auto;
+		width: 600px;
+		height: 800px;
+		position: absolute;
+		border: 1px solid #CCC;
+		-webkit-transition: -webkit-transform 0s;
+		-moz-transition: -moz-transform 0s;
+		-ms-transition: -ms-transform 0s;
+		-o-transition: -o-transform 0s;
+		transition: transform 0s;
+		-webkit-transform-style: preserve-3d;
+		-moz-transform-style: preserve-3d;
+		-ms-transform-style: preserve-3d;
+		-o-transform-style: preserve-3d;
+		transform-style: preserve-3d;
+		-webkit-transform-origin: left center;
+		-moz-transform-origin: left center;
+		-ms-transform-origin: left center;
+		-o-transform-origin: left center;
+		transform-origin: left center;
+    }
+
+    .page .front, .page .back {
+    	overflow: hidden;
+		display: block;
+		height: 100%;
+		width: 100%;
+		line-height: 18px;
+		color: #333;
+		font-size: 14px;
+		position: absolute;
+		-webkit-backface-visibility: hidden;
+		-moz-backface-visibility: hidden;
+		-ms-backface-visibility: hidden;
+		-o-backface-visibility: hidden;
+		backface-visibility: hidden;
+		margin: 0px;
+		background: whiteSmoke;
+    }
+    
+    .page .back {
+		-webkit-transform: rotateY( 180deg );
+		-moz-transform: rotateY( 180deg );
+		-ms-transform: rotateY( 180deg );
+		-o-transform: rotateY( 180deg );
+		transform: rotateY( 180deg );
+    }
+
+  </style>
+</head>
+<body>
+<header>
+
+</header>
+	<section class="container">
+		<section class="scene"></section>
+	</section>
+
+<script src="js/libs/jquery-1.7.2.js"></script>
+<script>
+
+//global variables for debugging
+var page, threshold;
+var pages = [];
+var left = [];
+var right = [];
+var pageWidth = 600;
+var containerWidth = 1200;
+
+$(document).ready(function(){
+
+	//page class
+	page = function(el) {
+		this.el = el;
+		this.$el = $(el);
+		this.onLeft = function() {
+			return this.$el.hasClasS('page-left');
+		}
+		this.onRight = function() {
+			return this.$el.hasClasS('page-right');
+		}
+		this.transformOrigin = function(dir) { 
+			this.$el.css('-webkit-transform-origin', dir + ' center');
+		}
+		this.rotate = function (angle) {
+			this.$el.css('-webkit-transform', 'rotateX(5deg) rotateY( '+angle+'deg )');
+		}
+	}
+
+	//dom variables
+	$body = $("body");
+	$container = $(".container");
+	$scene = $(".scene");
+
+	//generate some cards and append them to the dom
+	generatePages();
+	updateZIndex();
+	var currPage = null;
+	var rotation, dir, perc, currTargetX;
+	var threshold = .7;
+
+	//setup scene
+	animateScene(pageWidth, 0, 0);
+
+	//begin listening for events
+	$body.bind('mousedown', startDrag)
+
+	function startDrag(e) {
+		e.preventDefault();
+		$body.bind('mousemove', updateDrag);
+		$body.bind('mouseup', stopDrag);
+
+		//save the position the user clicked on to begin the drag.
+		currTargetX = e.pageX;
+	}
+
+	//event called when user is dragging the mouse
+	function updateDrag(e) {
+		e.preventDefault();
+
+		var targetX = e.pageX;
+		var bodyWidth = $body.width();
+
+		function targetInBounds(leftBound, rightBound) {
+			return (targetX > leftBound && targetX < rightBound)
+		}
+
+		dir = (targetX < currTargetX) ? 'left' : 'right';
+		if(dir === 'left')
+			perc = (bodyWidth - targetX) / (bodyWidth * 2);
+		if(dir === 'right')
+			perc = targetX / (bodyWidth * 2);
+
+		perc = Math.abs(perc);
+
+		//If we've clicked and there is no card selected, figure out which one the user wanted.
+		if(currPage === null || typeof currPage === 'undefined') {
+			var mid = bodyWidth / 2;
+
+			if(currTargetX < mid)
+				currPage = left.pop();
+
+			if( currTargetX >= mid)
+				currPage = right.pop();
+
+		}
+
+		if(currPage === null || typeof currPage === 'undefined')
+			return;
+
+		//if mouse goes out of bounds of container, snap to either 1 or 0.
+		perc = Math.min(1, perc);
+		perc = Math.max(0, perc);
+
+		if(dir === 'left')
+			rotation = -(180 * perc);
+		else
+			rotation = -180 + (180 * perc);
+
+		//ensure currCard is ontop
+		currPage.$el.css('z-index', '10000').css('-webkit-transition', '.0s');
+
+		//currPage.transformOrigin('left');
+
+		currPage.rotate(rotation);
+
+		//moving right
+		if(dir === 'right') {
+			//card started on the left
+			if(rotation >= 0 - (180 * threshold) ) {
+				snapPage(currPage, 0, right)
+				return;
+			}
+		}
+
+		//moving left
+		if(dir === 'left') {
+			//If moving right to left, left origin
+			if(rotation <= -(180 - (180 * threshold)) ) {
+				snapPage(currPage, -180, left)
+				return;
+			}
+
+		}
+	}
+
+	function stopDrag(e) {
+		$body.unbind('mousemove');
+		$body.unbind('mouseup');
+	}
+
+	//moves the scene in 3c
+	function animateScene(x,y,z){
+		$scene.css('-webkit-transition', '2s').css('-webkit-transform', 'translate3d('+x+'px, '+y+'px, '+z+'px)');
+	}
+
+	//loops thru left & right and assigns z-index values based on index- last = highest value..
+	function updateZIndex() {
+		for( var i = 0; i < left.length; i++ ) {
+			if(i == left.length - 1 )
+				left[i].$el.css('z-index', 100);
+			else
+				left[i].$el.css('z-index', 0);
+
+			left[i].rotate(-180 + i * .25);
+		}
+
+		for( var i = 0; i < right.length; i++ ) {
+
+			if(i == right.length - 1 )
+				right[i].$el.css('z-index', 100);
+			else
+				right[i].$el.css('z-index', 0);
+
+			right[i].rotate(0 - i * .25);
+		}
+	}
+
+	//snaps the page to the angle and pushes it into the array. Handles scene logic.
+	function snapPage(page, angle, array) {
+		page.$el.css('-webkit-transition', '1s');
+		array.push(page);
+		updateZIndex();
+
+		//WTF.. dunno. It works. Prevents clipping and gives volume to the pages
+		/*console.log(angle)
+		if(angle == -180)
+			page.rotate(angle);
+		if(angle == 0)
+			page.rotate(angle - array.length * 1);*/
+
+		//two pages visible
+		if(left.length != 0 && right.length != 0)
+			animateScene(pageWidth, 0, -100)
+		//one page visible
+		else
+			animateScene(pageWidth, 0, 0);
+
+		currPage = null;
+		stopDrag();
+	}
+
+	//generates some sample pages
+	function generatePages() {
+		for( var i = 0; i < 50; i++) {
+
+			var $page = $("<div class='page'></div>");
+
+			if(i == 2)
+				$page.addClass('page-first');
+			if(i == 0)
+				$page.addClass('page-last');
+
+			//$page.css('z-index', i);
+			$page.attr('id', 'page-' + i);
+			
+			var $front = $("footer .front:first").clone();
+			console.log($(".page-header", $front))
+			$front.prepend('<span class="page-number float-right">' + i + "</span>")
+			var $back = $("footer .back:first").clone();
+			$back.prepend('<span class="page-number float-left">' + i + "</span>")
+			$page.append($front).append($back)
+
+			var c = new page($page);
+			pages.push(c);
+			right.push(c);
+
+			$scene.append($page);
+			//var margin = containerWidth - pageWidth;
+			//$page.css('margin-left', margin / 2)
+		}
+	}
+});
+
+</script>
+</body>
+<footer style="display:none">
+	<div>
+		<div class="front">
+			<div class="page-header">
+				<h1>Front Header</h1>
+			</div>
+			<hr/>
+			<div class="page-articles">
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.universetoday.com/95242/launch-day-timeline-for-spacexs-dragon/">Launch Day Timeline for SpaceX's Dragon</a>
+					</div>
+					<div class="subtitle">
+						<p>Saturday morning's launch window for SpaceX's historic test flight to the International Space Station lasts just one second. Company President Gwynne Shotwell predicted they have "better than a 50-50 shot on whether we lift off tomorrow," she said ...</p>
+					</div>
+					<div class="source">
+					Universe Today
+					</div>
+				</div>
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.huffingtonpost.com/2012/05/19/spacex-launch-abort-faulty-rocket-valve_n_1530487.html">SpaceX Launch Abort Traced To Faulty Rocket Engine Valve</a>
+					</div>
+					<div class="subtitle">
+						<p>This story was updated at 6:15 p.m. EDT. CAPE CANAVERAL, Fla. -- A failed rocket engine valve appears to be responsible for the unexpected abort of a private SpaceX rocket launch before dawn on Saturday (May 19), officials said. Dragon was due ...</p>
+					</div>
+					<div class="source">
+						Huffington Post
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			<hr/>
+			<div class="page-footer">
+				Test Footer
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="back">
+			<div class="page-header">
+				<h1>Back Header</h1>
+			</div>
+			<hr/>
+			<div class="page-articles">
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.universetoday.com/95242/launch-day-timeline-for-spacexs-dragon/">Launch Day Timeline for SpaceX's Dragon</a>
+					</div>
+					<div class="subtitle">
+						<p>Saturday morning's launch window for SpaceX's historic test flight to the International Space Station lasts just one second. Company President Gwynne Shotwell predicted they have "better than a 50-50 shot on whether we lift off tomorrow," she said ...</p>
+					</div>
+					<div class="source">
+					Universe Today
+					</div>
+				</div>
+				<div class="article masonry-brick">
+					<div class="title">
+						<a href="http://www.huffingtonpost.com/2012/05/19/spacex-launch-abort-faulty-rocket-valve_n_1530487.html">SpaceX Launch Abort Traced To Faulty Rocket Engine Valve</a>
+					</div>
+					<div class="subtitle">
+						<p>This story was updated at 6:15 p.m. EDT. CAPE CANAVERAL, Fla. -- A failed rocket engine valve appears to be responsible for the unexpected abort of a private SpaceX rocket launch before dawn on Saturday (May 19), officials said. Dragon was due ...</p>
+					</div>
+					<div class="source">
+						Huffington Post
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			<hr/>
+			<div class="page-footer">
+				Test Footer
+			</div>
+		</div>
+	</div>
+</footer>
+</html>

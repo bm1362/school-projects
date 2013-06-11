@@ -1,0 +1,150 @@
+#call-record-button {
+	position: fixed;
+	top: 60px;
+	left: 30px;
+	width: 100px;
+	height: 40px;
+	line-height: 40px;
+	vertical: middle;
+	background-color: rgba(0, 0, 0, .75);
+	color: red;
+	text-align: center;
+	-webkit-border-radius: 100px 100px 100px 100px;
+	border-radius: 100px 100px 100px 100px;
+	border: 1px solid rgba(150, 150, 150, .3);
+	cursor: pointer;
+	text-shadow: 0px 1px 1px black;
+}
+
+#call-record-button:active {
+	background-color: rgba(0, 0, 0, 1);
+	color: white;
+}
+
+#call-end-button {
+	position: fixed;
+	top: 60px;
+	right: 30px;
+	width: 100px;
+	height: 40px;
+	line-height: 40px;
+	vertical-align: middle;
+	background-color: rgba(0, 0, 0, .75);
+	color: red;
+	text-align: center;
+	-webkit-border-radius: 100px 100px 100px 100px;
+	border-radius: 100px 100px 100px 100px;
+	border: 1px solid rgba(150, 150, 150, .3);
+	cursor: pointer;
+	text-shadow: 0px 1px 1px black;
+}
+
+#call-end-button:active {
+	background-color: rgba(0, 0, 0, 1);
+	color: white;
+}
+
+#call-mute-button {
+	position: fixed;
+	width: 100%;
+	height: 100px;
+	top: 100px;
+}
+
+#call-mute-button-icon {
+	width: 100px;
+	height: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 100%;
+	vertical-align: bottom;
+	text-align: center;
+	color: white;
+	text-shadow: 0px 1px 1px black;
+}
+
+#call-opts {
+	position: fixed;
+	width: 100%;
+	height: 150px;
+	bottom: 40px;
+	background: rgba(0, 0, 0, .75);
+	border-top: 1px solid rgba(150, 150, 150, .3);
+	border-bottom: 1px solid rgba(150, 150, 150, .3);
+	overflow: hidden;
+	text-align: center;
+}
+
+.call-opts-btn {
+	width: 14.28%;
+	height: 100%;
+	color: white;
+	display: inline-block;
+	float: left;
+}
+
+.call-opts-btn img{
+	margin-top: 15px;
+}
+
+#call-opts-vol {
+	width: 42.9%;
+}
+
+
+#call-main {
+	position: fixed;
+	width: 100%;
+	top: 200px;
+	bottom: 190px;
+}
+
+#call-progress-bar {
+	border-top: 2px solid rgba(255, 255, 255, .7);
+	border-bottom: 2px solid rgba(255, 255, 255, .7);
+	vertical-align: middle;
+	line-height: 60px;
+	height: 60px;
+	position: fixed;
+	width: 100%;
+	bottom: 192px;
+	background-color: rgba(150, 150, 150, .3);
+	color: white;
+	font-size: 20px;
+	text-shadow: 0px 1px 1px black;
+}
+
+#call-progress-bar div{
+	margin-left: 20px;
+	display: inline-block;
+}
+
+#call-progress-bar-btn {
+	text-shadow: 0px 0px 0px black;
+	float: right;
+	margin-right: 80px;
+	border-top: 1px solid rgba(150, 150, 150, .3);
+	border-bottom: 1px solid rgba(150, 150, 150, .3);
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: rgba(150, 150, 150, .3);
+    width: 80px;
+    height: 30px;
+    margin-top: 15px;
+    margin-bottom: auto;
+    vertical-align: middle;
+    line-height: 30px;
+    font-size: 15px;
+    text-align: center;
+    background: #1e5799; /* Old browsers */
+	background: -moz-linear-gradient(top,  #1e5799 0%, #287eff 50%, #207cca 100%, #7db9e8 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1e5799), color-stop(50%,#287eff), color-stop(100%,#207cca), color-stop(100%,#7db9e8)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #1e5799 0%,#287eff 50%,#207cca 100%,#7db9e8 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #1e5799 0%,#287eff 50%,#207cca 100%,#7db9e8 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #1e5799 0%,#287eff 50%,#207cca 100%,#7db9e8 100%); /* IE10+ */
+	background: linear-gradient(top,  #1e5799 0%,#287eff 50%,#207cca 100%,#7db9e8 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=0 ); /* IE6-9 */
+
+
+}
+

@@ -1,0 +1,26 @@
+.slider {
+	width: 100%;
+	height: 100%;
+}
+
+.slider-guide {
+	background: white;
+}
+
+.slider-knob {
+	background: white;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.slider-left-bound, .slider-right-bound {
+	background: white;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.slider-inc-btn, .slider-dec-btn {
+	background: white;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+}

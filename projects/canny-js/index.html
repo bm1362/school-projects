@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Map Prototype</title>
+        <link rel="stylesheet" href="./css/bootstrap.css" type="text/css">
+        <link rel="stylesheet" href="./css/style.css" type="text/css">
+    </head>
+    <body>
+        <div id="main" class="container panel corners" style="text-align: center;">
+            <h1>Image Manipulation using Canvas</h1>
+            <hr/>
+            <table>
+                <thead>
+                    <tr>
+                        <td>In</td>
+                        <td>Out</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <canvas id="canvas-input" style="border:1px solid #d3d3d3;">your browser does not support the canvas tag </canvas>
+                        </td>
+                        <td>
+                            <canvas id="canvas-output" style="border:1px solid #d3d3d3;">your browser does not support the canvas tag </canvas>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td>
+                            Source Image
+                        </td>
+                        <td>
+                            <select id='imgs'>
+                                <option value="img/valve_orig.png">valve</option>
+                                <option value="img/sunset.png">sunset</option>
+                                <option value="img/firstfloor.png">firstfloor</option>
+                                <option value="img/Bikesgray.jpg">bikesgray</option>
+                                <option value="img/Grapevine_leaf.png">grapevine leaf</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Blur Radius (Integer)
+                        </td>
+                        <td>
+                            <input type="text" id="radius" value="0"></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Number of Passes (Integer)</td>
+                        <td>
+                            <input type="text" id="passes" value="1"></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ASCII Font Size</td>
+                        <td>
+                            <input type="text" id="ftSize" value="10"></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ASCII Sample Size</td>
+                        <td>
+                            <input type="text" id="asciiRadius" value="5"></input>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="controls">
+                <button id="blur" class="btn btn-large">Blur Image</button>
+                <button id="grayscale" class="btn btn-large">Convert to Grayscale</button>
+                <button id="canny" class="btn btn-large">Detect Edges</button>
+                <button id="ascii" class="btn btn-large">ASCII</button>
+            </div>
+            <span id="time" class="pull-left"></span><span id="src"></span>
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
+        <script src="./js/lib/bootstrap.js" type="text/javascript"></script>
+        <script src="./filters.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+            //init function
+            $(document).ready(function(){
+
+                W = Math.ceil($("#main").width()/2 - 4); //width of our container / 2, minus the border widths
+                H = 426; //height of sunset.png
+
+                var cin = document.getElementById("canvas-input");
+                var cout = document.getElementById("canvas-output");
+
+                cin.style.width =  W + "px";
+                cin.style.height = H + "px";
+                cin.setAttribute('width', W);
+                cin.setAttribute('height', H);
+
+                cout.style.width =  W + "px";
+                cout.style.height = H + "px";
+                cout.setAttribute('width', W);
+                cout.setAttribute('height', H);
+
+                inCtx = cin.getContext("2d");
+                outCtx = cout.getContext("2d");
+
+                loadImage("img/valve_orig.png", inCtx, 0, 0, W, H);
+
+                $("#blur").click(function(){
+
+                    //Get radius value
+                    var val = $("#radius").val();
+                    var radius = parseInt(val);
+
+                    //Get number of passes value
+                    val = $("#passes").val()
+                    var passes = parseInt(val);
+
+                    //bring it
+                    var runtime = blur(inCtx, outCtx, W, H, radius, passes);
+
+                    $("#time").text("Completed in " + runtime / 1000  + " seconds")
+                });
+
+                $("#grayscale").click(function(){
+                    var runtime =  grayscale(inCtx, outCtx, W, H);
+
+                    $("#time").text("Completed in " + runtime / 1000  + " seconds")
+                })
+
+                $("#canny").click(function(){
+                    var val = $("#radius").val();
+                    var radius = parseInt(val);
+
+                    var runtime = doCanny(radius);
+                    $("#time").text("Completed in " + runtime / 1000  + " seconds")
+                })
+
+                $("#imgs").change(function(e) {
+                    console.log(this)
+                    var val = $(this).val();
+                    console.log(val)
+                    loadImage(val, inCtx, 0, 0, W, H);
+                })
+
+                $("#ascii").click(function(){
+                    var radius = parseInt($("#asciiRadius").val())
+                    var ftSize = parseInt($("#ftSize").val())
+                    console.log(radius)
+                    console.log(ftSize)
+                    var runtime =  toASCII(inCtx, outCtx, W, H, ftSize, radius);
+
+                    $("#time").text("Completed in " + runtime / 1000  + " seconds")
+                })
+
+            });
+
+
+        </script>
+    </body>
+</html>

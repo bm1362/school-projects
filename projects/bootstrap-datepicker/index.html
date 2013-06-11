@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Bootstrap DatePicker Demo</title>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="bootstrap-datepicker.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 40px;
+      }
+    </style>
+  </head>
+
+  <body>
+
+  <div class="container">
+  <div class="page-header">
+    <h1>A Sample Form</h1>
+  </div>
+  <div class="row">
+    <div class="span4">
+      <h2>DatePicker Demo</h2>
+      <p>See <a href="http://dl.dropbox.com/u/143355/datepicker/datepicker.html"> the original.</a> This is a <a href="https://github.com/zybreak/bootstrap-datepicker">fork</a>, here is the <a href="https://github.com/bm1362/bootstrap-datepicker">source</a>.
+
+      <hr>
+
+      <h3>Additional Options</h3>
+      <ul>
+        <li><code>noOffset: [boolean]</code>
+          <p>Useful for using the datepicker in the bootstrap-modal plugin; disables the plugin from automatically offsetting the calendar.</p>
+        </li>
+        <li><code>preventPast: [boolean]</code>
+          <p>Prevents users from selecting a date that is in the past.</p>
+        </li>
+        <li><code>limit: [Date Object or integer representing a offset from today, in milliseconds]</code>
+          <p>Allows developer to set a limit on the dates that are available for the user to select.</p>
+        </li>
+      </ul>
+    </div>
+    <div class="span8">
+      <form class="form-horizontal">
+        <fieldset>
+          <legend>Examples</legend>
+          <div class="control-group">
+            <label class="control-label" for="input01">Select a Date</label>
+            <div class="controls">
+              <input type="text" class="input-small" id="input01">
+              <p class="help-block">Default datepicker with no options specified.</p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="input02">Select a Date</label>
+            <div class="controls">
+              <input type="text" class="input-small" id="input02">
+              <p class="help-block"><code>preventPast: true</code></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="input03">Select a Date</label>
+            <div class="controls">
+              <input type="text" class="input-small" id="input03">
+              <p class="help-block"><code>preventPast: true, noOffset: true</code></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="input04">Select a Date</label>
+            <div class="controls">
+              <input type="text" class="input-small" id="input04">
+              <p class="help-block"><code>preventPast: true, limit: new Date("1/1/2013")</code></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="input05">Select a Date</label>
+            <div class="controls">
+              <input type="text" class="input-small" id="input05">
+              <p class="help-block"><code>preventPast: true, limit: (60 * 60 * 24 * 7) * 1000</code></p>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div><!-- /row -->
+  </div><!-- /container -->
+
+    <!-- Le javascript -->
+    <script src="http://code.jquery.com/jquery-1.7.min.js"></script>
+    <script src="bootstrap-datepicker.js"></script>
+    <script>
+      $("#input01").datepicker();
+      $("#input02").datepicker({preventPast:true});
+      $("#input03").datepicker({preventPast: true, noOffset: false});
+      $("#input04").datepicker({preventPast: true, limit: new Date("1/1/2013")});
+      $("#input05").datepicker({preventPast: true, limit: (60 * 60 * 24 * 7) * 1000});
+    </script>
+  </body>
+</html>

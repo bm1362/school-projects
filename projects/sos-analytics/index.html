@@ -1,0 +1,375 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+    <style>
+      .row { padding: 10px; }
+
+    </style>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['corechart', 'Table']});   // Don't need to specify chart libraries!
+      google.setOnLoadCallback(drawVisualization);
+      var data;
+      var views = [];
+
+      function filter() {
+        getSelection();
+      }      
+
+      function drawDependents(view) {
+          for( var i = 0; i < view.dependents.length; i++)
+            view.dependents[i].draw(view);
+      }
+
+      function drawVisualization() {
+        data = createData();
+
+        var table = new google.visualization.Table(document.getElementById('table'));
+        var graph = new google.visualization.AreaChart(document.getElementById('graph'));
+        var line = new google.visualization.LineChart(document.getElementById('line'));
+        var bar = new google.visualization.ColumnChart(document.getElementById('bar'));
+        var scatter = new google.visualization.LineChart(document.getElementById('scatter'));
+
+        var view = new google.visualization.DataView(data);
+        view.dependents = [];
+        table.draw(view);
+        graph.draw(view);
+        view.dependents.push(table);
+        view.dependents.push(graph);
+
+        var percView = new google.visualization.DataView(data);
+        percView.dependents = [];
+        percView.options = function(view) {
+          var numCols = view.getNumberOfColumns();
+          var ids = {
+            'date': 1,
+            'open-total': 1,
+            'lt4': 1
+          }
+          var cols = new Array();
+          for( var i = 0; i < numCols; i++ ) {
+            if(ids[view.getColumnId(i)] )
+              cols.push(i);
+          }
+          
+          view.setColumns(cols);
+
+          //view.setRows([0,1,2,3,4,5,6,7,8,9]);
+          
+          return view;
+        };
+
+        percView.options(percView);
+  
+        line.draw(percView);
+        bar.draw(percView);
+        percView.dependents.push(bar);
+        percView.dependents.push(line);
+
+        var view2 = new google.visualization.DataView(data);
+        view2.dependents = [];
+        view2.options = function(view) {
+          var numCols = view.getNumberOfColumns();
+          var ids = {
+            'date': 1,
+            //'open-total': 1,
+            'perc-lt4': 1
+          }
+          var cols = new Array();
+          for( var i = 0; i < numCols; i++ ) {
+            if(ids[view.getColumnId(i)] )
+              cols.push(i);
+          }
+          
+          view.setColumns(cols);
+
+          //view.setRows([0,1,2,3,4,5,6,7,8,9]);
+          
+          return view;
+        };
+
+        view2.options(view2);
+
+        scatter.draw(view2);
+
+        view2.dependents.push(scatter);
+
+        views.push(view);
+        views.push(percView);
+        views.push(view2);
+      }
+
+      function createData() {
+        var data = new google.visualization.DataTable();
+        var formatterDate = new google.visualization.DateFormat({pattern: 'MM/dd/yyyy'});
+
+        data.addColumn('string', 'Date', 'date');
+        data.addColumn('number', 'Opened', 'open-total');
+        data.addColumn('number', 'Resolved', 'res-total');
+        data.addColumn('number', 'Assigned < 4hrs', 'lt4');
+        data.addColumn('number', '% Assigned < 4hrs', 'perc-lt4');
+
+        var basis = new Date('1/1/2011');
+        for(var i = 0; i < 365; i++) {
+          var d = new Date(basis.getTime() + 24 * 60 * 60 * 1000 * i);
+          var opened = Math.ceil(Math.random() * 25 + 1);
+          var assigned = Math.ceil(Math.random() * opened);
+          var percAssigned = parseFloat((assigned/opened).toFixed(2));
+
+          data.addRow([formatterDate.formatValue(d), opened, Math.ceil(Math.random() * 25), assigned, percAssigned])
+        }
+
+
+        return data;
+      }
+
+      function changeViews(data) {
+        for( var i = 0; i < views.length; i++ ) {
+          var copy = views[i];
+          var v = new google.visualization.DataView(data);
+          views[i] = v;
+          views[i].dependents = copy.dependents;
+          views[i].options = copy.options;
+
+          if(views[i].options != undefined) {
+            views[i].options(views[i]);
+            //console.log(views[i]);
+          }
+
+          for( var j = 0; j < views[i].dependents.length; j++) {
+            drawDependents(views[i]);
+          }
+        }
+      }
+
+      function showSelection(rows, cols) {
+        for(var i = 0; i < views.length; i++) {
+          if(rows.length != 0)
+            views[i].setRows(rows);
+          
+          if(cols.length != 0 && !views[i].options) {
+            cols = ([0]).concat(cols);
+            views[i].setColumns(cols);
+          }
+          for(var j = 0; j < views[i].dependents.length; j++) {
+            drawDependents(views[i]);
+            views[i].dependents[j].setSelection([]);
+          }
+        }
+      }
+
+      function getSelection() {
+        var rows = new Array();
+        var cols = new Array();
+        for(var i = 0; i < views.length; i++) {
+          for(var j = 0; j < views[i].dependents.length; j++) {
+            var obj = views[i].dependents[j].getSelection();
+            console.log(obj)
+            for(var k = 0; k < obj.length; k++) {
+              console.log(obj[k])
+              if(obj[k].row != undefined)
+                rows.push(obj[k].row);
+              if(obj[k].column != undefined)
+                cols.push(obj[k].column);
+            }
+          }
+        }
+        
+        showSelection(rows, cols);
+      }
+
+      function createWeekly(data) {
+        var weeklyData = new google.visualization.DataTable();
+        weeklyData.addColumn('string', 'Date', 'date');
+        weeklyData.addColumn('number', 'Avg Opened per Day', 'open-avg');
+        weeklyData.addColumn('number', 'Avg Resolved per Day', 'res-avg');
+        weeklyData.addColumn('number', 'Total Opened per Week','open-total');
+        weeklyData.addColumn('number', 'Total Resolved per Week', 'res-total');
+        weeklyData.addColumn('number', 'Total Assigned < 4hrs per Week', 'lt4');
+        weeklyData.addColumn('number', '% Assigned < 4hrs', 'perc-lt4');
+
+        var data = data.D;
+
+        for( var i = 0; i < data.length - 1; i+=7) {
+
+          var date = data[i].c[0].v;
+          var avgOpen = 0;
+          var avgResolved = 0;
+          var sumOpen = 0;
+          var sumResolved = 0;
+          var sumAssigned = 0;
+          var percAssigned = 0;
+
+          for(var j = i; j < i + 7; j++) {
+
+            sumOpen += data[j].c[1].v;
+            sumResolved += data[j].c[2].v;
+            sumAssigned += data[j].c[3].v;
+          }
+
+          avgOpen = Math.ceil(sumOpen / 7);
+          avgResolved = Math.ceil(sumResolved / 7);
+          percAssigned = parseFloat((sumAssigned/sumOpen).toFixed(2));
+
+          weeklyData.addRow([date, avgOpen, avgResolved, sumOpen, sumResolved, sumAssigned, percAssigned]);
+
+        }
+
+        return weeklyData;
+      }
+
+      function createMonthly(data) {
+
+        var monthlyData = new google.visualization.DataTable();
+        monthlyData.addColumn('string', 'Date', 'date');
+        monthlyData.addColumn('number', 'Avg Opened / Day', 'open-avg');
+        monthlyData.addColumn('number', 'Avg Resolved / Day', 'res-avg');
+        monthlyData.addColumn('number', 'Total Opened / Month', 'open-total')
+        monthlyData.addColumn('number', 'Total Resolved / Month', 'res-total')
+        monthlyData.addColumn('number', 'Total Assigned < 4hrs / Month', 'lt4');
+        monthlyData.addColumn('number', '% Assigned < 4hrs', 'perc-lt4')
+
+        var data = data.D;
+        var formatterDate = new google.visualization.DateFormat({pattern: 'MM/dd/yyyy'});
+
+        for( var i = 0; i < data.length - 1; i+=31) {
+
+          var d = new Date(data[i].c[0].v);
+          d.setDate('1');
+          var date = formatterDate.formatValue(d);
+          var avgOpen = 0;
+          var avgResolved = 0;
+          var sumOpen = 0;
+          var sumResolved = 0;
+          var sumAssigned = 0;
+          var percAssigned = 0;
+
+          for(var j = i; j < i + 31; j++) {
+            if(!data[i] || !data[j]) { break; }
+
+            sumOpen += data[j].c[1].v;
+            sumResolved += data[j].c[2].v;
+            sumAssigned += data[j].c[3].v;
+          }
+
+          avgOpen = Math.ceil(sumOpen / 31);
+          avgResolved = Math.ceil(sumResolved / 31);
+          percAssigned = parseFloat((sumAssigned/sumOpen).toFixed(2)) * 100;
+
+          monthlyData.addRow([date, avgOpen, avgResolved, sumOpen, sumResolved, sumAssigned, percAssigned]);
+        }
+
+        return monthlyData;
+      }
+      $("document").ready(function() {
+        $("#input01").datepicker();
+        $("#input02").datepicker();
+
+        $("#filter-by-date").on('click', function() {
+          var start = $("#input01").val();
+          var end = $("#input02").val();
+          var formatterDate = new google.visualization.DateFormat({pattern: 'MM/dd/yyyy'});
+          if( start.length <= 0 || end.length <= 0)
+            return;
+
+          changeViews(data);
+
+          start = new Date(start);
+          start = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+          end = new Date(end);
+          end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
+
+          for( var i = 0; i < views.length; i++) {
+            views[i].setRows(data.getFilteredRows([{
+              column: 0, 
+              minValue: formatterDate.formatValue(start),
+              maxValue: formatterDate.formatValue(end),
+            }]));
+            drawDependents(views[i]);
+
+            //views[i] = view;
+          }
+
+        });
+      });
+    </script>
+  </head>
+  <body style="font-family: Arial;border: 0 none;">
+    <div class="container">
+      <div class="row">
+        <!-- Main hero unit for a primary marketing message or call to action -->
+        <div class="span12">
+          <p><h2>Some SOS Analytics!</h2>All data is generated for now. <br/><br/>Click on a header or select row(s) using ctrl-click and then click 'Filter Selection' to filter data.</p>
+          <div class="btn-group">
+            <button class="btn" onclick="javascript:changeViews(data);">Daily</button>
+            <button class="btn" onclick="javascript:changeViews(createWeekly(data));">Weekly</button>
+            <button class="btn" onclick="javascript:changeViews(createMonthly(data));">Monthly</button>
+          </div>
+          <button class="btn btn-primary" onclick="javascript:filter();">Filter Selection</button>
+          <hr>
+          <h5>Filter by date range</h5>
+          <div class="form-horizontal">
+            <div class="control-group">
+              <label class="control-label" for="input01">Start Date</label>
+              <div class="controls">
+                <input type="text" class="input-small" id="input01" class="datepicker">
+                <p class="help-block"></p>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="input01">End Date</label>
+              <div class="controls">
+                <input type="text" class="input-small" id="input02" class="datepicker">
+                <p class="help-block"></p>
+              </div>
+            </div>
+            <button class="btn primary" id="filter-by-date">Filter by date</button>
+          </div>
+        </div>
+        <div class="span12">
+          <!-- Example row of columns -->
+          <div class="row">
+            <div class="span12">
+              <h2>Table</h2>
+               <div id="table" style="width: 100%; height: 400px;"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="span12">
+              <h2>Area Chart</h2>
+               <div id="graph" style="width: 100%; height: 400px"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="span12">
+              <h2>Line Chart</h2>
+              <div id="line" style="width: 100%; height: 400px;"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="span12">
+              <h2>Bar Chart</h2>
+              <div id="bar" style="width: 100%; height: 400px;"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="span12">
+              <h2>Another Line Chart</h2>
+              <div id="scatter" style="width: 100%; height: 400px;"></div>
+            </div>
+          </div>
+          <hr>
+        </div>
+        <footer>
+          <p>&copy; Polycom 2012</p>
+        </footer>
+      </div>
+    </div> <!-- /container -->
+  </body>
+</html>

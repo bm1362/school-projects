@@ -1,0 +1,99 @@
+#call-record-button {
+	position: fixed;
+	top: 60px;
+	left: 30px;
+	width: 100px;
+	height: 40px;
+	line-height: 40px;
+	vertical: middle;
+	background-color: rgba(0, 0, 0, .75);
+	color: red;
+	text-align: center;
+	-webkit-border-radius: 100px 100px 100px 100px;
+	border-radius: 100px 100px 100px 100px;
+	border: 1px solid rgba(150, 150, 150, .3);
+	cursor: pointer;
+	text-shadow: 0px 1px 1px black;
+}
+
+#call-record-button:active {
+	background-color: rgba(0, 0, 0, 1);
+	color: white;
+}
+
+#call-end-button {
+	position: fixed;
+	top: 60px;
+	right: 30px;
+	width: 100px;
+	height: 40px;
+	line-height: 40px;
+	vertical-align: middle;
+	background-color: rgba(0, 0, 0, .75);
+	color: red;
+	text-align: center;
+	-webkit-border-radius: 100px 100px 100px 100px;
+	border-radius: 100px 100px 100px 100px;
+	border: 1px solid rgba(150, 150, 150, .3);
+	cursor: pointer;
+	text-shadow: 0px 1px 1px black;
+}
+
+#call-end-button:active {
+	background-color: rgba(0, 0, 0, 1);
+	color: white;
+}
+
+#call-mute-button {
+	position: fixed;
+	width: 100%;
+	height: 100px;
+	top: 100px;
+}
+
+#call-mute-button-icon {
+	width: 100px;
+	height: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 100%;
+	vertical-align: bottom;
+	text-align: center;
+	color: white;
+	text-shadow: 0px 1px 1px black;
+}
+
+#call-main {
+	position: fixed;
+	width: 100%;
+	top: 300px;
+	bottom: 190px;
+}
+
+#call-opts {
+	position: fixed;
+	width: 100%;
+	height: 150px;
+	bottom: 40px;
+	background: rgba(0, 0, 0, .75);
+	border-top: 1px solid rgba(150, 150, 150, .3);
+	border-bottom: 1px solid rgba(150, 150, 150, .3);
+	overflow: hidden;
+	text-align: center;
+}
+
+.call-opts-btn {
+	width: 14.28%;
+	height: 100%;
+	color: white;
+	display: inline-block;
+	float: left;
+}
+
+.call-opts-btn img{
+	margin-top: 15px;
+}
+
+#call-opts-vol {
+	width: 42.9%;
+}
